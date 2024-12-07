@@ -23,20 +23,20 @@ class Day04Test {
   void realPart1() {
     String input = Utils.getInput(packageName, InputType.REAL);
 
-    assertThat(day.partOne(input)).isEqualTo(166905464);
+    assertThat(day.partOne(input)).isEqualTo(2514);
   }
 
   @Test
   void examplePart2() {
     String input = Utils.getInput(packageName, InputType.EXAMPLE);
 
-    assertThat(day.partTwo(input)).isEqualTo(48);
+    assertThat(day.partTwo(input)).isEqualTo(9);
   }
 
   @Test
   void realPart2() {
     String input = Utils.getInput(packageName, InputType.REAL);
 
-    assertThat(day.partTwo(input)).isEqualTo(72948684);
+    assertThat(day.partTwo(input)).isEqualTo(1888);
   }
 }

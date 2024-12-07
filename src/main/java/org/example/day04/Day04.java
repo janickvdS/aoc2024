@@ -37,7 +37,81 @@ public class Day04 {
   }
 
   public int partTwo(String input){
-    return 0;
+    Map<Koordinate, Character> charMap = refactorInput(input);
+    List<Koordinate> startKoordinaten = findAllDoubleM(input);
+    int xmasCount = 0;
+    for(Koordinate koordinateM : startKoordinaten){
+      Koordinate horizontalM = new Koordinate(koordinateM.getX() +2,koordinateM.getY());
+      Koordinate verticalM = new Koordinate(koordinateM.getX(),koordinateM.getY() +2);
+      if(charMap.containsKey(horizontalM) && charMap.get(horizontalM) == 'M'){
+        Koordinate downA = new Koordinate(koordinateM.getX() +1,koordinateM.getY() +1);
+        Koordinate upA = new Koordinate(koordinateM.getX() +1,koordinateM.getY() -1);
+        Koordinate leftS;
+        Koordinate rightS;
+        if(charMap.containsKey(downA) && charMap.get(downA) == 'A') {
+          leftS = new Koordinate(downA.getX() - 1, downA.getY() + 1);
+          rightS = new Koordinate(downA.getX() + 1, downA.getY() + 1);
+          if (charMap.containsKey(leftS) && charMap.get(leftS) == 'S' &&
+                  charMap.containsKey(rightS) && charMap.get(rightS) == 'S'
+          ) {
+            xmasCount++;
+          }
+        }
+
+        if(charMap.containsKey(upA) && charMap.get(upA) == 'A') {
+          leftS = new Koordinate(upA.getX() - 1, upA.getY() - 1);
+          rightS = new Koordinate(upA.getX() + 1, upA.getY() - 1);
+          if (charMap.containsKey(leftS) && charMap.get(leftS) == 'S' &&
+                  charMap.containsKey(rightS) && charMap.get(rightS) == 'S'
+          ) {
+            xmasCount++;
+          }
+        }
+      }
+      if(charMap.containsKey(verticalM) && charMap.get(verticalM) == 'M'){
+        Koordinate leftA = new Koordinate(koordinateM.getX() - 1,koordinateM.getY() +1);
+        Koordinate rightA = new Koordinate(koordinateM.getX() +1,koordinateM.getY() +1);
+        Koordinate upS;
+        Koordinate downS;
+        if(charMap.containsKey(leftA) && charMap.get(leftA) == 'A') {
+          upS = new Koordinate(leftA.getX() - 1, leftA.getY() - 1);
+          downS = new Koordinate(leftA.getX() - 1, leftA.getY() + 1);
+          if (charMap.containsKey(upS) && charMap.get(upS) == 'S' &&
+                  charMap.containsKey(downS) && charMap.get(downS) == 'S'
+          ) {
+            xmasCount++;
+          }
+        }
+
+        if(charMap.containsKey(rightA) && charMap.get(rightA) == 'A') {
+          upS = new Koordinate(rightA.getX() + 1, rightA.getY() - 1);
+          downS = new Koordinate(rightA.getX() + 1, rightA.getY() + 1);
+          if (charMap.containsKey(upS) && charMap.get(upS) == 'S' &&
+                  charMap.containsKey(downS) && charMap.get(downS) == 'S'
+          ) {
+            xmasCount++;
+          }
+        }
+      }
+    }
+    return xmasCount;
+  }
+
+  List<Koordinate> findAllDoubleM(String input){
+    List<Koordinate> result = new ArrayList<>();
+    String[] splitByRow = Utils.splitByRow(input);
+    for (int y = 0; y < splitByRow.length; y++) {
+      for(int x = 0; x < splitByRow[y].length(); x++){
+        try {
+          if (splitByRow[y].charAt(x) == 'M' && x+2 < splitByRow[y].length() && splitByRow[y].charAt(x + 2) == 'M') {
+            result.add(new Koordinate(x, y));
+          } else if (splitByRow[y].charAt(x) == 'M' && y+ 2 < splitByRow.length && splitByRow[y + 2].charAt(x) == 'M') {
+            result.add(new Koordinate(x, y));
+          }
+        } catch (Exception ignored){}
+      }
+    }
+    return result;
   }
 
   List<Koordinate> lookForM(Map<Koordinate,Character> input, Koordinate koordinateX) {
