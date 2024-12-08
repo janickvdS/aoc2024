@@ -30,7 +30,7 @@ class Day06Test {
   void examplePart2() {
     String input = Utils.getInput(packageName, InputType.EXAMPLE);
 
-    assertThat(day.partTwo(input)).isEqualTo(123);
+    assertThat(day.partTwo(input)).isEqualTo(6);
   }
 
   @Test

@@ -1,6 +1,8 @@
 package org.example.day06;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.example.Utils;
 import org.example.day04.Koordinate;
@@ -10,80 +12,72 @@ public class Day06 {
     char[][] map = refactorInput(input);
     Koordinate start = findStart(map);
 
-    int x = start.getX();
-    int y = start.getY();
+    Map<Koordinate, Boolean> visited = new HashMap<>();
 
-    char cursor = '^';
+    Cursor cursor = new Cursor(start.getX(),start.getY());
 
-    while(!outOfBound(map,x,y)){
-      if(map[y][x] == '^' && !isZielfeldBlocked(map,x,y-1)){
-        map[y][x] = 'X';
-        y--;
-        cursor = '^';
-      } else if(map[y][x] == '^' && isZielfeldBlocked(map,x,y-1)){
-        map[y][x] = 'X';
-        x++;
-        cursor = '>';
-      } else if(map[y][x] == '>' && !isZielfeldBlocked(map,x +1,y)){
-        map[y][x] = 'X';
-        x++;
-        cursor = '>';
-      } else if(map[y][x] == '>' && isZielfeldBlocked(map,x +1,y)){
-        map[y][x] = 'X';
-        y++;
-        cursor = 'v';
-      } else if(map[y][x] == 'v' && !isZielfeldBlocked(map,x,y+1)){
-        map[y][x] = 'X';
-        y++;
-        cursor = 'v';
-      } else if(map[y][x] == 'v' && isZielfeldBlocked(map,x,y +1)){
-        map[y][x] = 'X';
-        x--;
-        cursor = '<';
-      }  else if(map[y][x] == '<' && !isZielfeldBlocked(map,x -1,y)){
-        map[y][x] = 'X';
-        x--;
-        cursor = '<';
-      } else if(map[y][x] == '<' && isZielfeldBlocked(map,x -1,y)){
-        map[y][x] = 'X';
-        y--;
-        cursor = '^';
-      }
+    while(cursor.isInMap(map)){
+      visited.put(new Koordinate(cursor.getX(),cursor.getY()),true);
+      cursor.move(map);
+    };
 
-      if(!outOfBound(map,x,y)){
-        map[y][x] = cursor;
-      }
-    }
-
-    return countX(map);
-  }
-
-  private boolean isZielfeldBlocked(char[][] map, int x, int y){
-    if(!outOfBound(map,x,y)){
-      return map[y][x] == '#';
-    } else {
-      return false;
-    }
-  }
-
-  private boolean outOfBound(char[][] map, int x, int y){
-    return y < 0 || x < 0 || y == map.length || x == map[y].length;
-  }
-
-  private int countX(char[][] map){
-    int x = 0;
-    for (char[] row : map) {
-      for (char col : row) {
-        if (col == 'X') {
-          x++;
-        }
-      }
-    }
-    return x;
+    return visited.size();
   }
 
   public int partTwo(String input){
-    return 0;
+    char[][] originalMap = refactorInput(input);
+    Koordinate start = findStart(originalMap);
+
+
+    int countOfLoops = 0;
+    for(int yPosition = 0; yPosition < originalMap.length; yPosition++){
+      for(int xPosition = 0; xPosition < originalMap[yPosition].length; xPosition++){
+
+        if(originalMap[yPosition][xPosition] == '.' ){
+          char[][] updatedMap = deepCopy(originalMap);
+          Map<Koordinate,CursorSymbol> visited = new HashMap<>();
+//          System.out.format("Blocker in x %s y %s \n", xPosition, yPosition);
+          updatedMap[yPosition][xPosition] = '#';
+
+          Cursor cursor = new Cursor(start.getX(),start.getY());
+
+          while(cursor.isInMap(updatedMap)){
+            visited.put(cursor.getKoordinate(),cursor.getSymbol());
+            if(cursor.wasCursorInNextSpotAlready(updatedMap, visited)){
+//              System.out.format("Loop wenn x %s y %s \n", xPosition, yPosition);
+//              System.out.println(Arrays.deepToString(updatedMap));
+              countOfLoops++;
+              break;
+            }
+            cursor.move(updatedMap);
+          };
+        }
+
+
+      }
+    }
+
+    return countOfLoops;
+  }
+
+  public static char[][] deepCopy(char[][] original) {
+    if (original == null) {
+      return null;
+    }
+
+    char[][] copy = new char[original.length][];
+
+    for (int i = 0; i < original.length; i++) {
+      // Kopiere jede Sub-Array für eine tiefe Kopie
+      copy[i] = new char[original[i].length];
+      System.arraycopy(original[i], 0, copy[i], 0, original[i].length);
+    }
+
+    return copy;
+  }
+
+  private boolean isPositionStart(Koordinate startPosition, int x, int y){
+    return startPosition.getX() == x && startPosition.getY() == y;
   }
 
   Koordinate findStart(char[][] map){
